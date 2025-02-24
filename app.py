@@ -1,7 +1,25 @@
 import streamlit as st
 import pickle
-import joblib  # Added joblib support
+import joblib
 import numpy as np
+
+# Load the Neural Network model with error handling
+def load_model():
+    model_filename = "neural_network_model.pkl"
+    try:
+        # First, try loading with pickle
+        with open(model_filename, "rb") as model_file:
+            model = pickle.load(model_file)
+        return model
+    except (AttributeError, pickle.UnpicklingError):
+        st.error("Error loading model! Possible version mismatch.")
+        st.stop()
+    except Exception as e:
+        st.error(f"Unexpected error: {str(e)}")
+        st.stop()
+
+# Load model
+loaded_nn_model = load_model()
 
 # Function to collect user input
 def collect_user_input():
@@ -65,23 +83,6 @@ user_input = collect_user_input()
 st.title("User Input")
 st.write(user_input)
 
-# Load the Neural Network model with error handling
-def load_model():
-    model_filename = "neural_network_model.pkl"
-    try:
-        with open(model_filename, "rb") as model_file:
-            model = pickle.load(model_file)
-        return model
-    except AttributeError as e:
-        st.error("Error loading model! Possible version mismatch.")
-        st.stop()
-    except Exception as e:
-        st.error(f"Unexpected error: {str(e)}")
-        st.stop()
-
-# Load model
-loaded_nn_model = load_model()
-
 # Function to make prediction
 def make_prediction(model, user_input):
     try:
@@ -105,4 +106,3 @@ if st.button("Predict"):
     if burnout_category_prediction:
         st.title("Prediction for Burnout Category")
         st.write(f"Predicted Burnout Category: {burnout_category_prediction}")
-    
